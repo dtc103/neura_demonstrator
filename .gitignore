@@ -1,0 +1,19 @@
+# Local Python environments and generated caches
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Raw camera/robot capture sessions and runtime logs
+captures/
+*.log
+*.tmp
+
+# Local credentials and assistant configuration
+.aws/
+.codex/
+.agents/
+.env
+.env.*
+!.env.example

@@ -1,0 +1,16 @@
+{
+  "robot": {
+    "model": "Franka Emika Panda",
+    "system_version": "4.2.3-tum",
+    "base_frame": "panda_link0",
+    "flange_frame": "panda_link8"
+  },
+  "cameras": {
+    "wrist": "130322272081",
+    "side": "130322271876",
+    "opposite": "130322271346"
+  },
+  "board": "board/board.json",
+  "printed_square_size_verified": false,
+  "session": "captures/take2"
+}

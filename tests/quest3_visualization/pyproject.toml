@@ -1,0 +1,6 @@
+[project]
+name = "quest3-visualization"
+version = "0.1.0"
+description = "Live Quest controller pose visualization via WebXR"
+requires-python = ">=3.12"
+dependencies = []

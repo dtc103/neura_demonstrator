@@ -1,0 +1,6 @@
+[project]
+name = "scene-calibration"
+version = "0.1.0"
+description = "Franka Panda and three RealSense D405 calibration preparation"
+requires-python = ">=3.12"
+dependencies = ["numpy", "opencv-python", "pyrealsense2"]

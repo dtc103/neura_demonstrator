@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Pose math checks</title></head>
+<body><pre id="result">Running…</pre><script type="module">
+import {identity, multiply, poseMatrix, quaternionMultiply, rotateVector, relativePose, lookAt} from './math.js';
+const close=(actual,expected) => {
+  if (actual.length!==expected.length || actual.some((v,i)=>Math.abs(v-expected[i])>1e-6))
+    throw new Error(`Expected ${expected}; received ${actual}`);
+};
+try {
+  const s=Math.SQRT1_2, yaw=[0,s,0,s], roll=[0,0,s,s];
+  close(multiply(identity(),poseMatrix([1,2,3],yaw)),poseMatrix([1,2,3],yaw));
+  close(rotateVector(yaw,[0,0,-1]),[-1,0,0]);
+  close(poseMatrix([0,0,0],yaw).slice(0,3),rotateVector(yaw,[1,0,0]));
+  const origin={position:[1,2,3],orientation:yaw};
+  const neutral=relativePose(origin,origin);
+  close(neutral.position,[0,0,0]); close(neutral.orientation,[0,0,0,1]);
+  const moved=relativePose({position:[2,4,2],orientation:quaternionMultiply(roll,yaw)},origin);
+  close(moved.position,[1,2,-1]); close(moved.orientation,roll);
+  close(multiply(lookAt([0,0,3],[0,0,0]),poseMatrix([0,0,3],[0,0,0,1])),identity());
+  document.getElementById('result').textContent='PASS: translation, rotation, recentering, matrix composition, camera';
+} catch(error) { document.getElementById('result').textContent=`FAIL: ${error.message}`; }
+</script></body></html>

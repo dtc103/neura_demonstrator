@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quest 3 controller pose</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Quest 3 controller pose</h1>
+    <p id="intro">Move and rotate your controller to move the box.</p>
+    <div class="controls">
+      <label>Controller <select id="hand"><option value="right">Right</option><option value="left">Left</option></select></label>
+      <button id="recenter">Recenter box</button>
+      <label id="demo-control"><input id="demo" type="checkbox"> Simulation</label>
+      <button id="start" hidden>Start Quest tracking</button>
+    </div>
+    <p id="status" role="status">Connecting…</p>
+    <p id="detail">Position in meters · X right · Y up · −Z forward</p>
+  </header>
+  <canvas id="scene" aria-label="Three dimensional controller box"></canvas>
+  <footer>Red = X · Green = Y · Blue = Z · Grid spacing 0.25 m · Drag to orbit · Scroll to zoom</footer>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
