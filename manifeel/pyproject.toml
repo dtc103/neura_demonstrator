@@ -1,0 +1,14 @@
+[project]
+name = "manifeel"
+version = "0.1.0"
+description = "ManiFeel datasets converted for GR00T fine-tuning"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "numpy",
+    "pyarrow",
+    "scipy",
+    "zarr<3",
+]
+
+[tool.uv]
+package = false

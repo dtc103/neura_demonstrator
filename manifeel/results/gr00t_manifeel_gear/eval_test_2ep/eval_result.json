@@ -1,0 +1,11 @@
+{
+  "success_rate": 0.0,
+  "n_test": 2,
+  "max_steps": 50,
+  "seed": 100000,
+  "task": "assemble the gear onto the shaft",
+  "videos": [
+    "media/jq3o0uu1.mp4",
+    "media/voh975ok.mp4"
+  ]
+}

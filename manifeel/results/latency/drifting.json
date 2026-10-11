@@ -1,0 +1,76 @@
+{
+  "model": "gr00t_n1.7_vlm_drifting",
+  "checkpoint": "/hnvme/workspace/y300bb11-isaag-groot/manifeel/runs_lerobot/gr00t_drifting_manifeel_20k/checkpoints/020000/pretrained_model",
+  "gpu": "NVIDIA H200",
+  "torch": "2.11.0+cu128",
+  "params_backbone_M": 1523.500032,
+  "params_action_head_M": 385.66208,
+  "results": [
+    {
+      "batch_size": 1,
+      "end_to_end": {
+        "median_ms": 40.293127531185746,
+        "mean_ms": 42.78649537707679,
+        "p90_ms": 40.97687497269362,
+        "min_ms": 40.00780207570642,
+        "max_ms": 276.22838609386235,
+        "n": 100
+      },
+      "backbone_ms": {
+        "median_ms": 24.910592997912318,
+        "mean_ms": 24.937445999821648,
+        "p90_ms": 25.02912898780778,
+        "min_ms": 24.78668699041009,
+        "max_ms": 25.761498021893203,
+        "n": 100
+      },
+      "action_head_ms": {
+        "median_ms": 8.538498019333929,
+        "mean_ms": 8.544372125761583,
+        "p90_ms": 8.585937053430825,
+        "min_ms": 8.438382064923644,
+        "max_ms": 8.92897299490869,
+        "n": 100
+      },
+      "other_median_ms": 6.8440365139395,
+      "chunk_shape": [
+        1,
+        8,
+        6
+      ]
+    },
+    {
+      "batch_size": 50,
+      "end_to_end": {
+        "median_ms": 184.13994152797386,
+        "mean_ms": 185.19617014797404,
+        "p90_ms": 186.80120825301856,
+        "min_ms": 181.5853549633175,
+        "max_ms": 225.25938996113837,
+        "n": 100
+      },
+      "backbone_ms": {
+        "median_ms": 122.07363196648657,
+        "mean_ms": 122.18218372901902,
+        "p90_ms": 122.73426408646628,
+        "min_ms": 121.42593692988157,
+        "max_ms": 123.6196169629693,
+        "n": 100
+      },
+      "action_head_ms": {
+        "median_ms": 9.894432965666056,
+        "mean_ms": 9.950704489601776,
+        "p90_ms": 10.146655014250427,
+        "min_ms": 9.79384290985763,
+        "max_ms": 11.055673006922007,
+        "n": 100
+      },
+      "other_median_ms": 52.17187659582123,
+      "chunk_shape": [
+        50,
+        8,
+        6
+      ]
+    }
+  ]
+}
