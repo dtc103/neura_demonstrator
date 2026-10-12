@@ -8,6 +8,19 @@ from generate_board import definition, make_board, svg_board
 
 
 class BoardTests(unittest.TestCase):
+    def test_larger_a4_board_has_matching_physical_geometry(self):
+        config = definition(35)
+        svg = ET.fromstring(svg_board(config))
+        namespace = {"s": "http://www.w3.org/2000/svg"}
+        pattern = svg.find("s:svg", namespace)
+        self.assertEqual(float(pattern.attrib["width"]), 175)
+        self.assertEqual(float(pattern.attrib["height"]), 245)
+        self.assertGreaterEqual(float(pattern.attrib["x"]), 10)
+        self.assertGreaterEqual(float(pattern.attrib["y"]), 10)
+        np.testing.assert_allclose(make_board(config).getChessboardCorners(),
+                                   make_board(definition(25)).getChessboardCorners() * 1.4, atol=2e-8)
+        self.assertAlmostEqual(config["marker_length_m"], 0.0245)
+
     def test_printable_vector_pattern_matches_detectable_board(self):
         config = definition()
         board = make_board(config)

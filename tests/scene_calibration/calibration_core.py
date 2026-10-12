@@ -150,8 +150,11 @@ def solve_dataset(metadata, samples, max_translation_mm=5.0, max_rotation_deg=2.
     base_cameras = {}
     for role in ("side", "opposite"):
         observations = [s["observations"][role] for s in training if role in s["observations"]]
-        if len(observations) < 3 or not any(role in s["observations"] for s in validation):
-            raise ValueError(f"Need at least 3 training observations and 1 held-out observation for {role}")
+        validation_count = sum(role in s["observations"] for s in validation)
+        if len(observations) < 3 or validation_count < 1:
+            raise ValueError(f"Need at least 3 training observations and 1 held-out observation for {role}; "
+                             f"found {len(observations)} training and {validation_count} held-out observations. "
+                             "Saved poses only count for a camera when its board detection was accepted.")
         base_cameras[role] = average_transform([base_board @ inverse(o["T_camera_from_board"]) for o in observations])
     errors = {"train": {r: [] for r in ROLES}, "validation": {r: [] for r in ROLES}}
     for sample in samples:

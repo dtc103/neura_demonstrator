@@ -9,6 +9,15 @@ motion, gripper, controller-switching, or recovery commands.
 
 ## Record and export the scene
 
+For teaching and replaying a predefined robot path with automatic stopped-pose
+captures, use [AUTOMATIC_CAPTURE.md](AUTOMATIC_CAPTURE.md). The default path
+review sends no robot commands; replay requires the explicit `--execute` option.
+
+An enlarged A4 target is available in [board_large/](board_large/README.md):
+35 mm squares and a 175 × 245 mm patterned area. Use `scene_config_take3.json`
+for that board, `captures/take3` for its bridge/captures, and `results/take3` for
+its solver output. Earlier board definitions and datasets remain separate.
+
 For the complete terminal sequence and a suggested capture plan, follow
 [PROCEDURE.md](PROCEDURE.md).
 
@@ -104,6 +113,7 @@ mounts and the wrist mount, too.
    results/scene.json
    results/panda.urdf
    results/calibration_report.json
+   results/calibration_summary.txt
    ```
 
    The default gates are maximum fixed-board consistency error of 5 mm and 2°,
@@ -112,6 +122,12 @@ mounts and the wrist mount, too.
    Failure produces a report but no accepted `scene.json`. Poor rotation
    diversity or missing captures stops fitting with an explicit message.
    Do not loosen limits just to obtain a file without investigating the errors.
+
+   The solver prints per-camera training/validation tables with observation
+   counts, average/maximum position, rotation, and image reprojection errors,
+   pass counts, and the worst failing capture IDs. `!` marks a maximum exceeding
+   its configured limit. The same overview is saved as `calibration_summary.txt`,
+   including when validation fails and no accepted scene is exported.
 
 The saved session includes raw PNG images, corner correspondences, factory
 intrinsics/distortion, robot joint positions and velocities, native robot
@@ -335,3 +351,8 @@ a separate task from this spatial calibration.
 - [D405 specifications and ideal range](https://www.realsenseai.com/product-family/d405-series/)
 - [Franka measured pose and frame definitions](https://frankarobotics.github.io/libfranka/latest/structfranka_1_1RobotState.html)
 - [Franka robot system and library compatibility](https://frankarobotics.github.io/docs/compatibility.html)
+# Automated pipeline
+
+See [PIPELINE.md](PIPELINE.md) for the single-command capture, calibration fit,
+held-out evaluation, and scene export workflow in `run_pipeline.py`.
+

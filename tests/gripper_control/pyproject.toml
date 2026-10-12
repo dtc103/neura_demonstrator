@@ -1,0 +1,6 @@
+[project]
+name = "panda-gripper-control"
+version = "0.1.0"
+description = "Open or close the Panda gripper through the existing ROS 2 action server"
+requires-python = ">=3.12"
+dependencies = []

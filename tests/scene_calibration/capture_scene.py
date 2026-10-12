@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import shutil
 import time
+from uuid import uuid4
 
 import cv2
 import numpy as np
@@ -126,6 +127,7 @@ def main():
     parser.add_argument("--config", type=Path, default=ROOT / "scene_config.json")
     parser.add_argument("--square-mm", type=float, help="Actual measured printed square size; confirms metric scale")
     parser.add_argument("--list", action="store_true", help="List serial numbers without opening streams")
+    parser.add_argument("--accept-requests", action="store_true", help="Accept automatic captures from run_trajectory.py")
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     home = args.config.resolve().parent
@@ -162,6 +164,9 @@ def main():
     except BlockingIOError as error:
         raise SystemExit("Another capture process is already using this session") from error
     cameras = {}
+    capture_token = uuid4().hex
+    processed_request = None
+    last_heartbeat = 0
     try:
         for role in ROLES:
             print(f"Starting {role} camera {config['cameras'][role]}: RGB 1280x720 at 30 FPS…", flush=True)
@@ -179,16 +184,21 @@ def main():
         board = make_board(board_config)
         detector = cv2.aruco.CharucoDetector(board)
         samples = list(session.glob("sample_*/sample.json"))
-        saved_poses = [json.loads(p.read_text())["T_base_from_flange"] for p in samples]
+        saved_samples = [json.loads(p.read_text()) for p in samples]
+        saved_poses = [s["T_base_from_flange"] for s in saved_samples]
+        coverage = {split: {role: sum(s["split"] == split and role in s["observations"] for s in saved_samples)
+                            for role in ROLES} for split in ("train", "validation")}
         next_id = max((int(p.parent.name.split("_")[1]) for p in samples), default=0) + 1
         print("All three streams started. Opening the preview window…", flush=True)
         print("SPACE: save training pose | V: save held-out validation pose | Q/Escape: quit", flush=True)
         print("Leave the board and fixed cameras stationary. Position the robot yourself; this tool sends no commands.")
         print(f"Writing {session.resolve()}; existing captures: {len(samples)}")
+        print(f"Accepted camera observations: {coverage}", flush=True)
         cached = {}
         status = "Waiting for all three color streams and robot state bridge"
         window = "Scene calibration — SPACE=train, V=validation"
         cv2.namedWindow(window, cv2.WINDOW_NORMAL)
+        preview_started = time.monotonic()
         while True:
             for role, camera in cameras.items():
                 frame = camera.image()
@@ -198,6 +208,12 @@ def main():
                     cached[role] = (image, stamp, observation, display, message)
             tiles = []
             now = time.monotonic_ns()
+            if args.accept_requests and now - last_heartbeat > 250_000_000:
+                write_json(session / "capture_ready.json", {
+                    "capture_token": capture_token, "received_monotonic_ns": now,
+                    "ready": len(cached) == 3 and all(now - e[1]["received_monotonic_ns"] <= 200_000_000 for e in cached.values()),
+                    "board_detected": {role: role in cached and cached[role][2] is not None for role in ROLES}})
+                last_heartbeat = now
             for role in ROLES:
                 if role not in cached:
                     tile = np.zeros((360, 640, 3), dtype=np.uint8)
@@ -210,17 +226,42 @@ def main():
                 cv2.rectangle(tile, (0, 0), (640, 45), (0, 0, 0), -1)
                 cv2.putText(tile, f"{role}: {config['cameras'][role]}", (8, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
                 cv2.putText(tile, message, (8, 37), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0, 220, 255), 1)
+                counts = f"Saved: {coverage['train'][role]} fitting / {coverage['validation'][role]} validation"
+                cv2.putText(tile, counts, (8, 61), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0, 255, 0), 1)
                 tiles.append(tile)
             grid = np.hstack(tiles)
             cv2.putText(grid, status[:180], (10, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
             cv2.imshow(window, grid)
             key = cv2.waitKey(1) & 0xFF
-            if key in (ord("q"), 27) or cv2.getWindowProperty(window, cv2.WND_PROP_VISIBLE) < 1:
+            if key in (ord("q"), 27):
+                print("Camera preview stopped: Q or Escape pressed.", flush=True)
                 break
+            # Some window backends report not-visible until the first window
+            # is mapped, or -1 when visibility querying is unsupported.
+            if time.monotonic() - preview_started > 1 and cv2.getWindowProperty(window, cv2.WND_PROP_VISIBLE) == 0:
+                print("Camera preview stopped: window reports closed.", flush=True)
+                break
+            request = None
+            if args.accept_requests and (session / "capture_request.json").exists():
+                candidate = json.loads((session / "capture_request.json").read_text())
+                if candidate.get("capture_token") == capture_token and candidate.get("id") != processed_request:
+                    request = candidate
+                    processed_request = request.get("id")
+                    key = ord("v") if request.get("split") == "validation" else ord(" ")
             if key not in (ord(" "), ord("v"), ord("V")):
                 continue
             destination = None
             try:
+                if request is not None:
+                    from trajectory_tools import vector
+                    if request.get("split") not in ("train", "validation") or not isinstance(request.get("id"), str):
+                        raise ValueError("Invalid automatic capture request")
+                    if not 0 <= (now - request["requested_monotonic_ns"]) / 1e9 <= 10:
+                        raise ValueError("Automatic capture request is stale")
+                    vector(request.get("expected_positions"))
+                    goal_tolerance = request.get("goal_tolerance_rad", 0.005)
+                    if type(goal_tolerance) not in (int, float) or not np.isfinite(goal_tolerance) or goal_tolerance <= 0:
+                        raise ValueError("Requested goal tolerance must be finite and greater than zero")
                 if len(cached) != 3 or any(now - entry[1]["received_monotonic_ns"] > 200_000_000 for entry in cached.values()):
                     raise ValueError("Waiting for fresh frames from all cameras")
                 if cached["wrist"][2] is None:
@@ -238,40 +279,70 @@ def main():
                 if before["bridge_id"] != robot["bridge_id"]:
                     raise ValueError("Robot bridge restarted during capture; retry")
                 representative, pose = stable_robot_sample(robot["samples"], start_ns, end_ns)
+                if request is not None and max(abs(a - b) for a, b in zip(representative["q"], request["expected_positions"])) > goal_tolerance:
+                    raise ValueError("Robot is not at the requested joint pose")
                 if any((error := difference(pose, old))["translation_mm"] < 2 and error["rotation_deg"] < 2 for old in saved_poses):
                     raise ValueError("This wrist pose was already saved; move/tilt to a different pose")
                 destination = session / f".sample_{next_id:04d}_{os.getpid()}.tmp"
                 destination.mkdir(exist_ok=False)
                 observations = {}
+                images = {}
                 for role, (image, stamp, observation, _, _) in cached.items():
-                    if observation is None:
-                        continue
                     image_name = f"{role}.png"
                     if not cv2.imwrite(str(destination / image_name), image):
                         raise OSError(f"Cannot save {image_name}")
-                    observations[role] = {**observation, **stamp, "image": image_name}
+                    images[role] = {**stamp, "image": image_name, "board_detected": observation is not None}
+                    if observation is not None:
+                        observations[role] = {**observation, **stamp, "image": image_name}
                 sample = {"id": next_id, "split": "train" if key == ord(" ") else "validation",
                           "captured_utc": datetime.now(timezone.utc).isoformat(), "bridge_id": robot["bridge_id"],
                           "T_base_from_flange": pose.tolist(), "robot": representative,
-                          "stability_interval_monotonic_ns": [start_ns, end_ns], "observations": observations}
+                          "stability_interval_monotonic_ns": [start_ns, end_ns], "observations": observations,
+                          "images": images}
+                if request is not None:
+                    sample["automation"] = {"request_id": request["id"], "waypoint": request.get("waypoint"),
+                                            "trajectory_sha256": request.get("trajectory_sha256"),
+                                            "goal_tolerance_rad": goal_tolerance,
+                                            "expected_joint_positions": request["expected_positions"]}
                 write_json(destination / "sample.json", sample)
                 destination.rename(session / f"sample_{next_id:04d}")
                 destination = None
                 saved_poses.append(pose.tolist())
+                for role in observations:
+                    coverage[sample["split"]][role] += 1
                 status = f"Saved {next_id}: {sample['split']} — board observations: {', '.join(observations)}"
                 print(status)
+                if request is not None:
+                    write_json(session / "capture_response.json", {"id": request["id"], "capture_token": capture_token,
+                               "status": "saved", "sample_id": next_id, "observations": list(observations)})
+                print(f"Accepted camera observations: {coverage}", flush=True)
+                if sample["split"] == "validation":
+                    missing = [r for r in ROLES if r not in observations]
+                    if missing:
+                        print(f"Validation saved without usable board detection for: {', '.join(missing)}. "
+                              "Those cameras still need separate accepted validation observations.", flush=True)
                 next_id += 1
             except (ValueError, OSError) as error:
                 if destination is not None and destination.exists():
                     shutil.rmtree(destination)
                 status = f"Not saved: {error}"
                 print(status)
+                if request is not None:
+                    write_json(session / "capture_response.json", {"id": request["id"], "capture_token": capture_token,
+                               "status": "failed", "message": str(error)})
     except (RuntimeError, ValueError) as error:
         raise SystemExit(str(error)) from error
     finally:
+        if args.accept_requests:
+            write_json(session / "capture_ready.json", {"capture_token": capture_token,
+                       "received_monotonic_ns": time.monotonic_ns(), "ready": False})
         for camera in cameras.values():
             camera.stop()
-        cv2.destroyAllWindows()
+        try:
+            cv2.destroyAllWindows()
+        except cv2.error:
+            # Preserve the original startup error if GUI support is unavailable.
+            pass
         lock.close()
 
 

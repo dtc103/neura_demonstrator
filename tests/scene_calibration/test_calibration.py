@@ -153,6 +153,11 @@ class WorkflowTests(unittest.TestCase):
                        "--session", str(root / "session"), "--output", str(root / "results")]
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("Scene calibration: PASS", result.stdout)
+            self.assertIn("Training", result.stdout)
+            self.assertIn("Validation", result.stdout)
+            self.assertIn("20 training / 4 validation", result.stdout)
+            self.assertTrue((root / "results/calibration_summary.txt").exists())
             scene_path = root / "results/scene.json"
             before = scene_path.read_bytes()
             scene = json.loads(before)
@@ -175,6 +180,11 @@ class WorkflowTests(unittest.TestCase):
             self.assertFalse((root / "results/scene.json").exists())
             report = json.loads((root / "results/calibration_report.json").read_text())
             self.assertFalse(report["passed"])
+            self.assertIn("Scene calibration: FAIL", result.stdout)
+            self.assertIn("worst capture IDs: 24", result.stdout)
+            self.assertIn(" !", result.stdout)
+            summary = (root / "results/calibration_summary.txt").read_text()
+            self.assertIn("No accepted scene was exported", summary)
 
     def test_capture_loop_saves_three_labeled_camera_observations_without_ros_or_gui(self):
         with tempfile.TemporaryDirectory() as root:
