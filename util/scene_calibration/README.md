@@ -65,7 +65,7 @@ mounts and the wrist mount, too.
 
    ```bash
    cd /home/jan/install/pixi_panda_ros2
-   pixi run -e jazzy python /home/jan/dev/neura_demonstrator/tests/scene_calibration/robot_state_bridge.py
+   pixi run -e jazzy python /home/jan/dev/neura_demonstrator/util/scene_calibration/robot_state_bridge.py
    ```
 
    Default topic: `/franka_robot_state_broadcaster/robot_state`. Confirm it with
@@ -79,7 +79,7 @@ mounts and the wrist mount, too.
    verifying a 25 mm print, run:
 
    ```bash
-   cd /home/jan/dev/neura_demonstrator/tests/scene_calibration
+   cd /home/jan/dev/neura_demonstrator/util/scene_calibration
    uv run capture_scene.py --list
    uv run capture_scene.py --square-mm 25
    ```
@@ -183,7 +183,7 @@ column-major Franka conversion, stationarity rejection, and held-out failure.
 ## Current step: prepare the board and check the cameras
 
 ```bash
-cd tests/scene_calibration
+cd util/scene_calibration
 uv sync
 uv run generate_board.py
 uv run check_board.py --list

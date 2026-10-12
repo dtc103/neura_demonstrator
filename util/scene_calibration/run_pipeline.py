@@ -130,7 +130,7 @@ def main():
         parser.error("Run the pipeline with the Panda Pixi Python, as used for run_trajectory.py")
     if not args.motion_only:
         if not camera_python.is_file():
-            parser.error("Camera uv environment is missing: tests/scene_calibration/.venv")
+            parser.error("Camera uv environment is missing: util/scene_calibration/.venv")
         if args.square_mm is None and not config.get("printed_square_size_verified"):
             parser.error("Pass --square-mm with your measured printed square size")
         if args.square_mm is not None and (not math.isfinite(args.square_mm) or args.square_mm <= 0):

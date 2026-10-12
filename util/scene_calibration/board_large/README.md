@@ -23,7 +23,7 @@ Use `../scene_config_take3.json`, which selects this definition and
 `captures/take3`. After verifying the print:
 
 ```bash
-cd ~/dev/neura_demonstrator/tests/scene_calibration
+cd ~/dev/neura_demonstrator/util/scene_calibration
 .venv/bin/python capture_scene.py --config scene_config_take3.json --square-mm 35
 ```
 
@@ -31,8 +31,8 @@ Start the robot bridge from the Panda Pixi project using the matching output:
 
 ```bash
 pixi run -e jazzy python \
-  /home/jan/dev/neura_demonstrator/tests/scene_calibration/robot_state_bridge.py \
-  --output /home/jan/dev/neura_demonstrator/tests/scene_calibration/captures/take3/robot_state.json
+  /home/jan/dev/neura_demonstrator/util/scene_calibration/robot_state_bridge.py \
+  --output /home/jan/dev/neura_demonstrator/util/scene_calibration/captures/take3/robot_state.json
 ```
 
 After collecting fitting and held-out validation captures, solve with:

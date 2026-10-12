@@ -44,14 +44,14 @@ collision checking. Replay indices change when points are inserted.
    ```bash
    cd /home/jan/install/pixi_panda_ros2
    pixi run -e jazzy python \
-     /home/jan/dev/neura_demonstrator/tests/scene_calibration/robot_state_bridge.py \
-     --output /home/jan/dev/neura_demonstrator/tests/scene_calibration/captures/automatic/robot_state.json
+     /home/jan/dev/neura_demonstrator/util/scene_calibration/robot_state_bridge.py \
+     --output /home/jan/dev/neura_demonstrator/util/scene_calibration/captures/automatic/robot_state.json
    ```
 
 3. Open the three camera views from the calibration folder:
 
    ```bash
-   cd /home/jan/dev/neura_demonstrator/tests/scene_calibration
+   cd /home/jan/dev/neura_demonstrator/util/scene_calibration
    .venv/bin/python capture_scene.py --config scene_config_auto.json \
      --square-mm 35 --accept-requests
    ```
@@ -63,7 +63,7 @@ collision checking. Replay indices change when points are inserted.
 4. In another terminal, start the teacher:
 
    ```bash
-   cd /home/jan/dev/neura_demonstrator/tests/scene_calibration
+   cd /home/jan/dev/neura_demonstrator/util/scene_calibration
    .venv/bin/python teach_waypoints.py --config scene_config_auto.json
    ```
 
@@ -148,8 +148,8 @@ transitions and testing the setup:
 
 ```bash
 pixi run -e jazzy python \
-  /home/jan/dev/neura_demonstrator/tests/scene_calibration/run_trajectory.py \
-  --config /home/jan/dev/neura_demonstrator/tests/scene_calibration/scene_config_auto.json \
+  /home/jan/dev/neura_demonstrator/util/scene_calibration/run_trajectory.py \
+  --config /home/jan/dev/neura_demonstrator/util/scene_calibration/scene_config_auto.json \
   --execute
 ```
 
@@ -202,7 +202,7 @@ tracking checks just to label an aborted movement successful.
 ## Phase D: solve offline
 
 ```bash
-cd /home/jan/dev/neura_demonstrator/tests/scene_calibration
+cd /home/jan/dev/neura_demonstrator/util/scene_calibration
 .venv/bin/python solve_scene.py --session captures/automatic --output results/automatic
 ```
 

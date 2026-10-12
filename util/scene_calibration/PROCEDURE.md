@@ -25,9 +25,9 @@ Prepare FCI using the procedure already established for this robot. In terminal 
 
 ```bash
 cd /home/jan/install/pixi_panda_ros2
-mkdir -p /home/jan/dev/neura_demonstrator/tests/scene_calibration/captures
+mkdir -p /home/jan/dev/neura_demonstrator/util/scene_calibration/captures
 pixi run -e jazzy franka robot_ip:=172.16.0.2 2>&1 | \
-  tee /home/jan/dev/neura_demonstrator/tests/scene_calibration/captures/panda_launch.log
+  tee /home/jan/dev/neura_demonstrator/util/scene_calibration/captures/panda_launch.log
 ```
 
 This launch opens the hand and activates the arm's joint trajectory torque
@@ -83,7 +83,7 @@ In terminal C:
 ```bash
 cd /home/jan/install/pixi_panda_ros2
 pixi run -e jazzy python \
-  /home/jan/dev/neura_demonstrator/tests/scene_calibration/robot_state_bridge.py
+  /home/jan/dev/neura_demonstrator/util/scene_calibration/robot_state_bridge.py
 ```
 
 The bridge saves recent measured robot states and the robot URDF. It sends no
@@ -100,7 +100,7 @@ pixi run -e jazzy ros2 topic list -t
 In terminal D, after verifying a 25 mm print:
 
 ```bash
-cd /home/jan/dev/neura_demonstrator/tests/scene_calibration
+cd /home/jan/dev/neura_demonstrator/util/scene_calibration
 uv run capture_scene.py --list
 uv run capture_scene.py --square-mm 25
 ```

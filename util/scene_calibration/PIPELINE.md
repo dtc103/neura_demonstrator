@@ -27,10 +27,10 @@ In another terminal:
 ```bash
 cd ~/install/pixi_panda_ros2
 pixi run -e jazzy python \
-  ~/dev/neura_demonstrator/tests/scene_calibration/run_pipeline.py \
-  --config ~/dev/neura_demonstrator/tests/scene_calibration/scene_config_auto.json \
-  --session ~/dev/neura_demonstrator/tests/scene_calibration/captures/pipeline_take1 \
-  --output ~/dev/neura_demonstrator/tests/scene_calibration/results/pipeline_take1 \
+  ~/dev/neura_demonstrator/util/scene_calibration/run_pipeline.py \
+  --config ~/dev/neura_demonstrator/util/scene_calibration/scene_config_auto.json \
+  --session ~/dev/neura_demonstrator/util/scene_calibration/captures/pipeline_take1 \
+  --output ~/dev/neura_demonstrator/util/scene_calibration/results/pipeline_take1 \
   --square-mm 35 \
   --speed-scale 8 \
   --disable-path-tolerance \
@@ -86,6 +86,6 @@ the bridge and cameras. The existing Panda launch remains running.
 To investigate or refit a saved dataset without moving the robot:
 
 ```bash
-cd ~/dev/neura_demonstrator/tests/scene_calibration
+cd ~/dev/neura_demonstrator/util/scene_calibration
 .venv/bin/python solve_scene.py --session captures/pipeline_take1 --output results/refit_take1
 ```
