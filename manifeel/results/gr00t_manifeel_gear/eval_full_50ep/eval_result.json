@@ -1,0 +1,19 @@
+{
+  "success_rate": 0.54,
+  "n_test": 50,
+  "max_steps": 500,
+  "seed": 100000,
+  "task": "assemble the gear onto the shaft",
+  "videos": [
+    "media/4wklm8um.mp4",
+    "media/6v5l713g.mp4",
+    "media/7dxujn3q.mp4",
+    "media/7zdqu6hn.mp4",
+    "media/dtcwg6l3.mp4",
+    "media/j587fidz.mp4",
+    "media/m7e8v75n.mp4",
+    "media/navxlaw9.mp4",
+    "media/y65ylmic.mp4",
+    "media/z6h7me8j.mp4"
+  ]
+}

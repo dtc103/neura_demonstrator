@@ -1,0 +1,111 @@
+Uninstalled 1 package in 3ms
+Installed 1 package in 12ms
+INFO:root:Extracted global_step 10000 from checkpoint path
+/tmp/910587.helma/Isaac-GR00T/.venv/lib/python3.12/site-packages/albumentations/__init__.py:13: UserWarning: A new version of Albumentations is available: 2.0.8 (you have 1.4.18). Upgrade using: pip install -U albumentations. To disable automatic update checks, set the environment variable NO_ALBUMENTATIONS_UPDATE to 1.
+  check_for_updates()
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLForConditionalGeneration is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLVisionModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLTextModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Total number of DiT parameters:  1091722240
+INFO:gr00t.model.gr00t_n1d7.gr00t_n1d7:Using AlternateVLDiT for diffusion model
+Total number of SelfAttentionTransformer parameters:  201433088
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 62.01it/s]
+INFO:root:Using 4 denoising steps
+INFO:root:Current modality config: 
+{'video': ModalityConfig(delta_indices=[0], modality_keys=['wrist'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'state': ModalityConfig(delta_indices=[0], modality_keys=['eef_position', 'eef_quaternion'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'action': ModalityConfig(delta_indices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], modality_keys=['delta_translation', 'delta_rotation'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=[ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None), ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None)]), 'language': ModalityConfig(delta_indices=[0], modality_keys=['annotation.human.task_description'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None)}
+INFO:root:Dataset length: 50
+INFO:root:Running evaluation on trajectories: [0]
+INFO:root:Running trajectory: 0
+INFO:root:Using 102 steps (requested: 200, trajectory length: 102)
+INFO:root:inferencing at step: 0
+INFO:root:inferencing at step: 16
+INFO:root:inferencing at step: 32
+INFO:root:inferencing at step: 48
+INFO:root:inferencing at step: 64
+INFO:root:inferencing at step: 80
+INFO:root:inferencing at step: 96
+INFO:root:Unnormalized Action MSE across single traj: 0.008891027420759201
+INFO:root:Unnormalized Action MAE across single traj: 0.0408300943672657
+INFO:root:state_joints vs time (102, 7)
+INFO:root:gt_action_joints vs time (102, 6)
+INFO:root:pred_action_joints vs time (102, 6)
+INFO:root:MSE for trajectory 0: 0.008891027420759201, MAE: 0.0408300943672657
+INFO:root:Average MSE across all trajs: 0.008891027420759201
+INFO:root:Average MAE across all trajs: 0.0408300943672657
+INFO:root:Done
+Uninstalled 1 package in 2ms
+Installed 1 package in 14ms
+INFO:root:Extracted global_step 10000 from checkpoint path
+/tmp/910587.helma/Isaac-GR00T/.venv/lib/python3.12/site-packages/albumentations/__init__.py:13: UserWarning: A new version of Albumentations is available: 2.0.8 (you have 1.4.18). Upgrade using: pip install -U albumentations. To disable automatic update checks, set the environment variable NO_ALBUMENTATIONS_UPDATE to 1.
+  check_for_updates()
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLForConditionalGeneration is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLVisionModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLTextModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Total number of DiT parameters:  1091722240
+INFO:gr00t.model.gr00t_n1d7.gr00t_n1d7:Using AlternateVLDiT for diffusion model
+Total number of SelfAttentionTransformer parameters:  201433088
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 63.07it/s]
+INFO:root:Using 4 denoising steps
+INFO:root:Current modality config: 
+{'video': ModalityConfig(delta_indices=[0], modality_keys=['wrist'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'state': ModalityConfig(delta_indices=[0], modality_keys=['eef_position', 'eef_quaternion'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'action': ModalityConfig(delta_indices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], modality_keys=['delta_translation', 'delta_rotation'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=[ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None), ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None)]), 'language': ModalityConfig(delta_indices=[0], modality_keys=['annotation.human.task_description'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None)}
+INFO:root:Dataset length: 50
+INFO:root:Running evaluation on trajectories: [1]
+INFO:root:Running trajectory: 1
+INFO:root:Using 157 steps (requested: 200, trajectory length: 157)
+INFO:root:inferencing at step: 0
+INFO:root:inferencing at step: 16
+INFO:root:inferencing at step: 32
+INFO:root:inferencing at step: 48
+INFO:root:inferencing at step: 64
+INFO:root:inferencing at step: 80
+INFO:root:inferencing at step: 96
+INFO:root:inferencing at step: 112
+INFO:root:inferencing at step: 128
+INFO:root:inferencing at step: 144
+INFO:root:Unnormalized Action MSE across single traj: 0.007816928438842297
+INFO:root:Unnormalized Action MAE across single traj: 0.03164738416671753
+INFO:root:state_joints vs time (157, 7)
+INFO:root:gt_action_joints vs time (157, 6)
+INFO:root:pred_action_joints vs time (157, 6)
+INFO:root:MSE for trajectory 1: 0.007816928438842297, MAE: 0.03164738416671753
+INFO:root:Average MSE across all trajs: 0.007816928438842297
+INFO:root:Average MAE across all trajs: 0.03164738416671753
+INFO:root:Done
+Uninstalled 1 package in 3ms
+Installed 1 package in 11ms
+INFO:root:Extracted global_step 10000 from checkpoint path
+/tmp/910587.helma/Isaac-GR00T/.venv/lib/python3.12/site-packages/albumentations/__init__.py:13: UserWarning: A new version of Albumentations is available: 2.0.8 (you have 1.4.18). Upgrade using: pip install -U albumentations. To disable automatic update checks, set the environment variable NO_ALBUMENTATIONS_UPDATE to 1.
+  check_for_updates()
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLForConditionalGeneration is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLVisionModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Flash Attention 2 only supports torch.float16 and torch.bfloat16 dtypes, but the current dype in Qwen3VLTextModel is torch.float32. You should run training or inference using Automatic Mixed-Precision via the `with torch.autocast(device_type='torch_device'):` decorator, or load the model with the `dtype` argument. Example: `model = AutoModel.from_pretrained("openai/whisper-tiny", attn_implementation="flash_attention_2", dtype=torch.float16)`
+Total number of DiT parameters:  1091722240
+INFO:gr00t.model.gr00t_n1d7.gr00t_n1d7:Using AlternateVLDiT for diffusion model
+Total number of SelfAttentionTransformer parameters:  201433088
+Loading checkpoint shards:   0%|          | 0/3 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 3/3 [00:00<00:00, 62.94it/s]
+INFO:root:Using 4 denoising steps
+INFO:root:Current modality config: 
+{'video': ModalityConfig(delta_indices=[0], modality_keys=['wrist'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'state': ModalityConfig(delta_indices=[0], modality_keys=['eef_position', 'eef_quaternion'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None), 'action': ModalityConfig(delta_indices=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15], modality_keys=['delta_translation', 'delta_rotation'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=[ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None), ActionConfig(rep=<ActionRepresentation.ABSOLUTE: 'absolute'>, type=<ActionType.NON_EEF: 'non_eef'>, format=<ActionFormat.DEFAULT: 'default'>, state_key=None)]), 'language': ModalityConfig(delta_indices=[0], modality_keys=['annotation.human.task_description'], sin_cos_embedding_keys=None, mean_std_embedding_keys=None, action_configs=None)}
+INFO:root:Dataset length: 50
+INFO:root:Running evaluation on trajectories: [2]
+INFO:root:Running trajectory: 2
+INFO:root:Using 109 steps (requested: 200, trajectory length: 109)
+INFO:root:inferencing at step: 0
+INFO:root:inferencing at step: 16
+INFO:root:inferencing at step: 32
+INFO:root:inferencing at step: 48
+INFO:root:inferencing at step: 64
+INFO:root:inferencing at step: 80
+INFO:root:inferencing at step: 96
+INFO:root:Unnormalized Action MSE across single traj: 0.011048448272049427
+INFO:root:Unnormalized Action MAE across single traj: 0.04694805666804314
+INFO:root:state_joints vs time (109, 7)
+INFO:root:gt_action_joints vs time (109, 6)
+INFO:root:pred_action_joints vs time (109, 6)
+INFO:root:MSE for trajectory 2: 0.011048448272049427, MAE: 0.04694805666804314
+INFO:root:Average MSE across all trajs: 0.011048448272049427
+INFO:root:Average MAE across all trajs: 0.04694805666804314
+INFO:root:Done
