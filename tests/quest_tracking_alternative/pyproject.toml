@@ -1,0 +1,9 @@
+[project]
+name = "quest-tracking-alternative"
+version = "0.1.0"
+description = "Controller-only WebXR local-floor tracking with console and Pygame viewers"
+requires-python = ">=3.12"
+dependencies = ["numpy", "scipy", "pygame>=2.6,<3"]
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]

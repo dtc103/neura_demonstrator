@@ -1,4 +1,4 @@
-"""Fit hand-eye calibration and export a validated robot/camera scene JSON."""
+"""Fit hand-eye calibration, report validation, and export robot/camera scene JSON."""
 
 import argparse
 from collections import Counter
@@ -57,7 +57,8 @@ def format_results(report, samples):
                   "Position/rotation measure fixed-board consistency; image RMS measures alignment in pixels."])
     if failures:
         lines.extend(["", "Failed observations:", *failures,
-                      "", "No accepted scene was exported. Inspect the flagged captures and detailed JSON report."])
+                      "", "WARNING: scene.json is exported despite failed validation; calibration.passed is false.",
+                      "Inspect the flagged captures and detailed JSON report before using the estimate."])
     else:
         lines.extend(["", "All checks passed. These checks assess consistency, not certified absolute accuracy."])
     return "\n".join(lines) + "\n"
@@ -94,6 +95,9 @@ def export_scene(metadata, samples, flange_wrist, base_board, base_cameras, repo
             "wrist_motion_rule": "T_base_from_wrist(t) = T_base_from_flange(t) @ cameras.wrist.T_parent_from_camera",
             "side_from_opposite": (inverse(base_cameras["side"]) @ base_cameras["opposite"]).tolist(),
             "calibration": {"passed": report["passed"], "report": "calibration_report.json", "sample_count": len(samples),
+                            "status": "validated" if report["passed"] else "validation_failed",
+                            "limits": report["limits"],
+                            "warnings": [] if report["passed"] else ["Calibration validation failed; exported transforms are an estimate that exceeds the configured error limits."],
                             "intrinsics_source": "RealSense SDK factory stream intrinsics; not independently recalibrated here."},
             "unmeasured_geometry": ["table boundaries and thickness", "fixtures", "objects", "camera housing/mount offsets"]}
 
@@ -136,8 +140,6 @@ def main():
         print("\n" + overview, flush=True)
         print(f"Summary: {args.output / 'calibration_summary.txt'}", flush=True)
         print(f"Detailed report: {args.output / 'calibration_report.json'}", flush=True)
-        if not report["passed"]:
-            raise SystemExit(1)
         shutil.copy2(urdf_path, args.output / "panda.urdf")
         scene = export_scene(metadata, samples, x, board, cameras, report)
         write_json(args.output / "scene.json", scene)

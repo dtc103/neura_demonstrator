@@ -1,0 +1,4 @@
+# Install into the existing ROS/Pixi Jazzy environment; it already has Pinocchio.
+pin-pink==4.4.0
+qpsolvers>=4.3,<5
+quadprog>=0.1.13,<0.2

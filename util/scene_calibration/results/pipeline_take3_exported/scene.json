@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-10-13T13:43:38.764380+00:00",
+  "units": {
+    "translation": "meters",
+    "joint_angles": "radians"
+  },
+  "matrix_convention": "Row-major nested arrays; column vectors; T_A_from_B maps B coordinates into A.",
+  "camera_axes": "RealSense color optical: +X right, +Y down, +Z forward. Convert explicitly for your simulator.",
+  "world_frame": "panda_link0",
+  "robot": {
+    "model": "Franka Emika Panda",
+    "system_version": "4.2.3-tum",
+    "base_frame": "panda_link0",
+    "flange_frame": "panda_link8",
+    "T_world_from_base": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "urdf": "panda.urdf",
+    "mesh_assets": "URDF package:// paths require the matching franka_description assets; meshes are not embedded.",
+    "reference_sample_id": 1,
+    "reference_joint_positions_rad": [
+      -0.02987528879327548,
+      -0.5742425692561354,
+      -0.06716306364431715,
+      -2.864998115688415,
+      -0.1647684317308804,
+      2.3371819576422372,
+      0.931165132234055
+    ],
+    "reference_joint_names": [
+      "panda_joint1",
+      "panda_joint2",
+      "panda_joint3",
+      "panda_joint4",
+      "panda_joint5",
+      "panda_joint6",
+      "panda_joint7"
+    ],
+    "T_base_from_flange_at_reference": [
+      [
+        0.6142291476622731,
+        -0.7878678552451015,
+        0.044573499229479716,
+        0.33222916924775026
+      ],
+      [
+        -0.783355473414364,
+        -0.6155821983881535,
+        -0.08609738265107153,
+        -0.0319673250585329
+      ],
+      [
+        0.09527201285705228,
+        0.017966627371076273,
+        -0.9952891257655109,
+        0.3488773648225123
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "board": {
+    "dictionary": "DICT_6X6_250",
+    "squares_x": 5,
+    "squares_y": 7,
+    "square_length_m": 0.035,
+    "marker_length_m": 0.0245,
+    "legacy_pattern": false,
+    "T_base_from_board": [
+      [
+        -0.9914925840564232,
+        0.13010429587433386,
+        -0.003915093378279396,
+        0.5856069541497525
+      ],
+      [
+        0.13015120117961518,
+        0.9913609148376857,
+        -0.01625427216734076,
+        -0.22021354329679269
+      ],
+      [
+        0.0017665199178843248,
+        -0.016625544419066645,
+        -0.9998602255716293,
+        -0.005505393765142113
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "origin": "OpenCV board origin at the patterned rectangle corner; axes follow board object points.",
+    "removable_after_calibration": true
+  },
+  "cameras": {
+    "wrist": {
+      "model": "RealSense D405",
+      "serial": "130322272081",
+      "stream": "color",
+      "intrinsics": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "fx": 645.1163330078125,
+        "fy": 644.192626953125,
+        "cx": 632.206787109375,
+        "cy": 363.0817565917969,
+        "distortion_model": "distortion.inverse_brown_conrady",
+        "distortion_coefficients": [
+          -0.05613112077116966,
+          0.06004423275589943,
+          0.0009299369412474334,
+          0.00033439183607697487,
+          -0.019961386919021606
+        ]
+      },
+      "frame": "wrist_color_optical",
+      "parent": "panda_link8",
+      "T_parent_from_camera": [
+        [
+          0.7107076616116054,
+          -0.5708278053916884,
+          0.4111571917384769,
+          -0.07905410701260365
+        ],
+        [
+          0.7034874215470999,
+          0.5769021855395551,
+          -0.41507748197739724,
+          0.07128120560376233
+        ],
+        [
+          -0.0002597144095674844,
+          0.5842426592704383,
+          0.8115789842258314,
+          0.027106363832860317
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_base_from_camera_at_reference": [
+        [
+          -0.11772934115751132,
+          -0.7791000242521035,
+          0.6157458521508598,
+          0.22871988738729326
+        ],
+        [
+          -0.9897687094844515,
+          0.041728606305032244,
+          -0.136442754081409,
+          -0.016253085862843897
+        ],
+        [
+          0.08060833676548955,
+          -0.6255092929974829,
+          -0.7760415068910239,
+          0.31564773462055923
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "side": {
+      "model": "RealSense D405",
+      "serial": "130322271876",
+      "stream": "color",
+      "intrinsics": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "fx": 644.5587158203125,
+        "fy": 643.94873046875,
+        "cx": 627.5517578125,
+        "cy": 367.10833740234375,
+        "distortion_model": "distortion.inverse_brown_conrady",
+        "distortion_coefficients": [
+          -0.05309551581740379,
+          0.05721534788608551,
+          0.00042396780918352306,
+          0.0011999669950455427,
+          -0.018359685316681862
+        ]
+      },
+      "frame": "side_color_optical",
+      "parent": "panda_link0",
+      "T_parent_from_camera": [
+        [
+          0.9924960371813818,
+          -0.08488141036935991,
+          0.08801569378788376,
+          0.46435541586373946
+        ],
+        [
+          -0.12203295822604031,
+          -0.733027047509054,
+          0.6691631376030521,
+          -0.3537782153670016
+        ],
+        [
+          0.0077183732648604545,
+          -0.6748825777821416,
+          -0.7378847694052763,
+          0.4245107017864566
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_base_from_camera_at_reference": [
+        [
+          0.9924960371813818,
+          -0.08488141036935991,
+          0.08801569378788376,
+          0.46435541586373946
+        ],
+        [
+          -0.12203295822604031,
+          -0.733027047509054,
+          0.6691631376030521,
+          -0.3537782153670016
+        ],
+        [
+          0.0077183732648604545,
+          -0.6748825777821416,
+          -0.7378847694052763,
+          0.4245107017864566
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "opposite": {
+      "model": "RealSense D405",
+      "serial": "130322271346",
+      "stream": "color",
+      "intrinsics": {
+        "width": 1280,
+        "height": 720,
+        "fps": 30,
+        "fx": 645.539306640625,
+        "fy": 644.8760986328125,
+        "cx": 632.9364013671875,
+        "cy": 361.0096130371094,
+        "distortion_model": "distortion.inverse_brown_conrady",
+        "distortion_coefficients": [
+          -0.05553066357970238,
+          0.058344416320323944,
+          0.0007839853642508388,
+          0.0011694394052028656,
+          -0.018977461382746696
+        ]
+      },
+      "frame": "opposite_color_optical",
+      "parent": "panda_link0",
+      "T_parent_from_camera": [
+        [
+          0.12869496496267793,
+          0.7178856068534846,
+          -0.6841621602119341,
+          0.8948285079698293
+        ],
+        [
+          0.9905612576429339,
+          -0.1258802340506852,
+          0.05424538258870144,
+          -0.13270658925625625
+        ],
+        [
+          -0.0471805134574113,
+          -0.6846856374628799,
+          -0.7273098218791947,
+          0.4193748704957814
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_base_from_camera_at_reference": [
+        [
+          0.12869496496267793,
+          0.7178856068534846,
+          -0.6841621602119341,
+          0.8948285079698293
+        ],
+        [
+          0.9905612576429339,
+          -0.1258802340506852,
+          0.05424538258870144,
+          -0.13270658925625625
+        ],
+        [
+          -0.0471805134574113,
+          -0.6846856374628799,
+          -0.7273098218791947,
+          0.4193748704957814
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  },
+  "camera_origin_distances_m_at_reference": {
+    "wrist_to_side": 0.42579156984061556,
+    "wrist_to_opposite": 0.684120918832223,
+    "side_to_opposite": 0.4839484721142051
+  },
+  "wrist_motion_rule": "T_base_from_wrist(t) = T_base_from_flange(t) @ cameras.wrist.T_parent_from_camera",
+  "side_from_opposite": [
+    [
+      0.006483965342688437,
+      0.7225754979759988,
+      -0.6912616059916635,
+      0.4002251732514479
+    ],
+    [
+      -0.7051906976571,
+      0.4934208814936921,
+      0.5091580438762432,
+      -0.19512456149950436
+    ],
+    [
+      0.708988038073513,
+      0.48416989108238406,
+      0.5127528434225849,
+      0.18961102250963252
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "calibration": {
+    "passed": false,
+    "report": "calibration_report.json",
+    "sample_count": 55,
+    "status": "validation_failed",
+    "limits": {
+      "translation_mm": 5,
+      "rotation_deg": 2,
+      "reprojection_rms_px": 3
+    },
+    "warnings": [
+      "Calibration validation failed; exported transforms are an estimate that exceeds the configured error limits."
+    ],
+    "intrinsics_source": "RealSense SDK factory stream intrinsics; not independently recalibrated here."
+  },
+  "unmeasured_geometry": [
+    "table boundaries and thickness",
+    "fixtures",
+    "objects",
+    "camera housing/mount offsets"
+  ]
+}

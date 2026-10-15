@@ -1,0 +1,15 @@
+[project]
+name = "quest-controller-tracking"
+version = "0.1.0"
+description = "Print Meta Quest controller coordinates using the Neuracore reader"
+requires-python = ">=3.12"
+dependencies = [
+    "meta-quest-teleop",
+    "numpy",
+    "scipy",
+    "pure-python-adb",
+    "pygame>=2.6,<3",
+]
+
+[tool.uv.sources]
+meta-quest-teleop = { git = "https://github.com/NeuracoreAI/meta_quest_teleop", branch = "main" }

@@ -79,8 +79,8 @@ class PipelineTests(unittest.TestCase):
             self.assertFalse((root / "new").exists())
 
     def test_capture_then_solver_and_failure_cleanup(self):
-        for runner_code, solver_code in ((0, 0), (0, 1), (1, 0)):
-            with self.subTest(runner=runner_code, solver=solver_code), tempfile.TemporaryDirectory() as directory:
+        for runner_code, solver_code, passed in ((0, 0, True), (0, 0, False), (0, 1, False), (1, 0, False)):
+            with self.subTest(runner=runner_code, solver=solver_code, passed=passed), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 argv = fixture(root) + ["--execute"]
                 bridge, camera, runner = Child(), Child(), Child(runner_code)
@@ -95,7 +95,7 @@ class PipelineTests(unittest.TestCase):
                     self.assertIsNotNone(bridge.returncode)
                     self.assertIsNotNone(camera.returncode)
                     if solver_code == 0:
-                        atomic_json(root / "results" / "scene.json", {"validated": True})
+                        atomic_json(root / "results" / "scene.json", {"calibration": {"passed": passed}})
                     return SimpleNamespace(returncode=solver_code)
 
                 with patch.object(sys, "argv", argv), patch.object(run_pipeline.importlib.util, "find_spec", return_value=object()), \
@@ -116,7 +116,10 @@ class PipelineTests(unittest.TestCase):
                 self.assertEqual(saved["session"], str(root / "new"))
                 self.assertEqual(saved["board"], str(root / "board.json"))
                 status = json.loads((root / "new" / "pipeline_status.json").read_text())
-                self.assertEqual(status["stage"], "failed" if runner_code else "calibration_failed" if solver_code else "complete")
+                self.assertEqual(status["stage"], "failed" if runner_code else "calibration_failed" if solver_code else
+                                 "complete" if passed else "complete_with_validation_warnings")
+                if not runner_code and not solver_code:
+                    self.assertEqual(status["validation_passed"], passed)
 
     def test_missing_or_duplicate_captures_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

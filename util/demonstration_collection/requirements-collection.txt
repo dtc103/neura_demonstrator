@@ -1,0 +1,4 @@
+# Add to the ROS/Pink interpreter used by teleoperate.py.
+PySide6>=6.6
+pyrealsense2
+opencv-python-headless

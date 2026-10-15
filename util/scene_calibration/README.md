@@ -119,15 +119,16 @@ mounts and the wrist mount, too.
    The default gates are maximum fixed-board consistency error of 5 mm and 2°,
    and RMS reprojection error ≤3 px, for both training and validation captures.
    These are initial acceptance limits, not a certified accuracy specification.
-   Failure produces a report but no accepted `scene.json`. Poor rotation
+   Failed validation produces a report and still exports `scene.json`, with
+   `calibration.passed=false` and explicit warnings. Poor rotation
    diversity or missing captures stops fitting with an explicit message.
-   Do not loosen limits just to obtain a file without investigating the errors.
+   Exporting an estimate does not require loosening the validation limits.
 
    The solver prints per-camera training/validation tables with observation
    counts, average/maximum position, rotation, and image reprojection errors,
    pass counts, and the worst failing capture IDs. `!` marks a maximum exceeding
    its configured limit. The same overview is saved as `calibration_summary.txt`,
-   including when validation fails and no accepted scene is exported.
+   including when validation fails and the exported scene carries warnings.
 
 The saved session includes raw PNG images, corner correspondences, factory
 intrinsics/distortion, robot joint positions and velocities, native robot

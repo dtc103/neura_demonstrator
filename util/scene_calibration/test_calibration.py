@@ -169,22 +169,27 @@ class WorkflowTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(scene_path.read_bytes(), before)
 
-    def test_failed_cli_validation_writes_report_without_scene(self):
+    def test_failed_cli_validation_exports_scene_with_failure_and_warnings(self):
         with tempfile.TemporaryDirectory() as root:
             root = Path(root)
             self.make_session(root / "session", bad=True)
             result = subprocess.run([sys.executable, str(Path(__file__).parent / "solve_scene.py"),
                                      "--session", str(root / "session"), "--output", str(root / "results")],
                                     capture_output=True, text=True)
-            self.assertNotEqual(result.returncode, 0)
-            self.assertFalse((root / "results/scene.json").exists())
+            self.assertEqual(result.returncode, 0, result.stderr)
+            scene = json.loads((root / "results/scene.json").read_text())
+            self.assertFalse(scene["calibration"]["passed"])
+            self.assertEqual(scene["calibration"]["status"], "validation_failed")
+            self.assertTrue(scene["calibration"]["warnings"])
+            self.assertTrue((root / "results/panda.urdf").exists())
             report = json.loads((root / "results/calibration_report.json").read_text())
             self.assertFalse(report["passed"])
             self.assertIn("Scene calibration: FAIL", result.stdout)
             self.assertIn("worst capture IDs: 24", result.stdout)
             self.assertIn(" !", result.stdout)
             summary = (root / "results/calibration_summary.txt").read_text()
-            self.assertIn("No accepted scene was exported", summary)
+            self.assertIn("exported despite failed validation", summary)
+            self.assertEqual(scene["calibration"]["limits"], report["limits"])
 
     def test_capture_loop_saves_three_labeled_camera_observations_without_ros_or_gui(self):
         with tempfile.TemporaryDirectory() as root:

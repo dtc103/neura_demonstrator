@@ -207,7 +207,12 @@ def main():
             return code
         if not (output / "scene.json").is_file():
             raise RuntimeError("Solver completed without exporting scene.json")
-        status["stage"] = "complete"
+        scene = json.loads((output / "scene.json").read_text())
+        passed = scene["calibration"]["passed"]
+        status["validation_passed"] = passed
+        status["stage"] = "complete" if passed else "complete_with_validation_warnings"
+        if not passed:
+            print("WARNING: Calibration validation failed. scene.json was exported with calibration.passed=false; inspect the report.", flush=True)
         print(f"Pipeline complete. Scene calibration: {output / 'scene.json'}", flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as error:

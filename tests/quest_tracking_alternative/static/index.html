@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quest controller tracking</title>
+<style>
+body{margin:0;background:#131823;color:#e5edf8;font:20px system-ui,sans-serif;padding:32px}
+main{max-width:720px;margin:auto}h1{font-size:34px}button{background:#66c5ee;color:#101722;border:0;border-radius:12px;padding:18px 24px;font:inherit;cursor:pointer}
+button:disabled{opacity:.5}p{line-height:1.5}#status{padding:18px;background:#202c3e;border-radius:12px;white-space:pre-line}small{color:#aebfd5}
+</style>
+<main>
+<h1>Controller tracking</h1>
+<p>Controller grip poses in a fixed <strong>local-floor</strong> tracking frame.</p>
+<button id="start">Start controller tracking</button>
+<button id="stop" disabled>Stop</button>
+<p id="status">Checking WebXR support…</p>
+<details><summary>Browser diagnostics</summary><pre id="diagnostics" style="white-space:pre-wrap;font-size:15px"></pre></details>
+<p><small>Bare-hand inputs are excluded. X selects the left controller and A selects the right in the desktop viewer. Recentring changes the reference frame; the desktop zero reference will reset.</small></p>
+</main>
+<script src="/app.js?v=20261014-recording"></script>
+</html>

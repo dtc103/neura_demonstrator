@@ -237,3 +237,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Raw demonstration sessions
+datasets/
+session_*/

@@ -76,10 +76,16 @@ stop immediately rather than being treated as a rejected camera observation.
 Each run stores `pipeline_config.json`, `trajectory.json`, and
 `pipeline_status.json` alongside images, robot states, and motion feedback.
 After every requested capture has been acknowledged, cameras/bridge stop and
-`solve_scene.py` prints fitting and held-out evaluation results. Successful
-validation exports `scene.json`, `panda.urdf`, `calibration_report.json`, and
-`calibration_summary.txt`. Failed validation preserves the diagnostics and
-exports no accepted scene. Failed motion/capture preserves partial data and
+`solve_scene.py` prints fitting and held-out evaluation results. A computed
+calibration always exports `scene.json`, `panda.urdf`, `calibration_report.json`,
+and `calibration_summary.txt`, even if error limits are exceeded. Failed
+validation leaves `calibration.passed=false`, `status=validation_failed`, and
+warnings in the scene file. The pipeline records
+`stage=complete_with_validation_warnings` and `validation_passed=false`.
+Export completion returns exit code zero; inspect the validation flag to decide
+whether the estimate meets your accuracy requirements. Missing or unusable
+input still prevents solving and no transforms are invented.
+Failed motion/capture preserves partial data and
 does not run the solver. Ctrl+C requests runner cancellation before stopping
 the bridge and cameras. The existing Panda launch remains running.
 
