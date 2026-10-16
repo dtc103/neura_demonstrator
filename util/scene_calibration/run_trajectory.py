@@ -226,8 +226,8 @@ class Runner:
             except CaptureFailure as error:
                 pending = error.pending_request
                 if attempt == retries:
-                   print (f"Capture failed after {retries + 1} attempts: Continue with next position.")
-                   break
+                    print(f"WARNING: Skipping capture at {waypoint['name']} after {retries + 1} attempts: {error}. Continuing to next position.", flush=True)
+                    return
                 pause = self.plan.get("retake_pause", 2.0)
                 print(f"Capture attempt {attempt + 1} failed: {error}. Retrying {attempt + 1}/{retries} after {pause:g}s.", flush=True)
                 start = time.monotonic()

@@ -1,0 +1,23 @@
+Scene calibration: FAIL
+Captures: 21 training / 5 validation (withheld from fitting)
+Maximum-error limits: 5 mm / 2 deg / 3 px
+
+Set          Camera      Obs.   Position mm        Rotation deg       Image RMS px       Passed     Result
+----------------------------------------------------------------------------------------------------------
+Training     wrist       21     5.11 / 13.16 !     0.27 / 0.48        7.56 / 23.53 !     2/21       FAIL
+Training     side        21     0.18 / 0.51        0.06 / 0.29        0.24 / 0.29        21/21      PASS
+Training     opposite    19     0.15 / 0.34        0.07 / 0.16        0.27 / 0.32        19/19      PASS
+Validation   wrist       5      6.92 / 8.61 !      0.37 / 0.69        8.23 / 12.26 !     0/5        FAIL
+Validation   side        5      0.18 / 0.25        0.04 / 0.06        0.27 / 0.33        5/5        PASS
+Validation   opposite    5      0.19 / 0.24        0.07 / 0.11        0.29 / 0.35        5/5        PASS
+
+Metrics show average / maximum. ! marks a maximum above its limit.
+Obs. counts accepted board observations, which can differ from saved pose counts.
+Position/rotation measure fixed-board consistency; image RMS measures alignment in pixels.
+
+Failed observations:
+  Training / wrist: 19 failed; worst capture IDs: 16, 10, 17, 23, 11
+  Validation / wrist: 5 failed; worst capture IDs: 26, 20, 19, 22, 25
+
+WARNING: scene.json is exported despite failed validation; calibration.passed is false.
+Inspect the flagged captures and detailed JSON report before using the estimate.

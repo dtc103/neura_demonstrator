@@ -227,7 +227,7 @@ class WorkflowTests(unittest.TestCase):
                  patch.object(capture_scene, "observe", return_value=(samples[0]["observations"]["wrist"], image, "OK")), \
                  patch.object(capture_scene, "read_robot", return_value=robot), \
                  patch.object(capture_scene, "stable_robot_sample", return_value=(samples[0]["robot"], np.eye(4))), \
-                 patch.object(cv2, "namedWindow"), patch.object(cv2, "imshow"), \
+                 patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), patch.object(cv2, "imshow"), \
                  patch.object(cv2, "destroyAllWindows"), patch.object(cv2, "waitKey", side_effect=[32, ord("q")]), \
                  patch.object(cv2, "getWindowProperty", return_value=1):
                 capture_scene.main()

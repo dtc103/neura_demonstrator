@@ -86,7 +86,8 @@ class PipelineTests(unittest.TestCase):
                 bridge, camera, runner = Child(), Child(), Child(runner_code)
 
                 def ready(session, processes, timeout, cameras):
-                    for i in range(13):
+                    # Two rejected captures must not prevent invoking the solver.
+                    for i in range(1, 12):
                         sample = session / f"sample_{i:04d}" / "sample.json"
                         atomic_json(sample, {"split": "train" if i < 10 else "validation",
                                              "automation": {"waypoint": f"pose_{i}"}})
@@ -120,17 +121,32 @@ class PipelineTests(unittest.TestCase):
                                  "complete" if passed else "complete_with_validation_warnings")
                 if not runner_code and not solver_code:
                     self.assertEqual(status["validation_passed"], passed)
+                    self.assertEqual(status["capture_summary"]["missing"], {"pose_0": 1, "pose_12": 1})
+                    self.assertEqual(status["capture_summary"]["saved"], 11)
 
-    def test_missing_or_duplicate_captures_rejected(self):
+    def test_missing_captures_allowed_but_duplicates_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             waypoints = [{"name": "one", "capture": "train"}, {"name": "transit", "capture": "none"}]
-            with self.assertRaisesRegex(ValueError, "incomplete"):
-                run_pipeline.verify_captures(root, waypoints)
+            summary = run_pipeline.verify_captures(root, waypoints)
+            self.assertEqual(summary["missing"], {"one": 1})
+            self.assertFalse(summary["complete"])
             for i in range(2):
                 atomic_json(root / f"sample_{i}" / "sample.json", {"split": "train", "automation": {"waypoint": "one"}})
             with self.assertRaisesRegex(ValueError, "extra"):
                 run_pipeline.verify_captures(root, waypoints)
+
+    def test_complete_and_mismatched_captures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            waypoints = [{"name": "one", "capture": "train"}]
+            sample = root / "sample_1" / "sample.json"
+            atomic_json(sample, {"split": "train", "automation": {"waypoint": "one"}})
+            self.assertTrue(run_pipeline.verify_captures(root, waypoints)["complete"])
+            for split, name in (("validation", "one"), ("train", "unknown")):
+                atomic_json(sample, {"split": split, "automation": {"waypoint": name}})
+                with self.assertRaisesRegex(ValueError, "Unexpected capture or split"):
+                    run_pipeline.verify_captures(root, waypoints)
 
     def test_startup_failure_starts_no_runner_and_cleans_up(self):
         with tempfile.TemporaryDirectory() as directory:

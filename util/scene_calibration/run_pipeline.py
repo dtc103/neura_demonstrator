@@ -95,8 +95,13 @@ def verify_captures(session, waypoints):
         if name not in splits or sample["split"] != splits[name]:
             raise ValueError(f"Unexpected capture or split: {path}")
         actual[name] += 1
-    if actual != expected:
-        raise ValueError(f"Capture sequence incomplete: missing {dict(expected - actual)}, extra {dict(actual - expected)}")
+    missing, extra = dict(expected - actual), dict(actual - expected)
+    if extra:
+        raise ValueError(f"Unexpected extra captures: {extra}")
+    if missing:
+        print(f"WARNING: Missing captures: {missing}. Continuing calibration with the saved observations.", flush=True)
+    return {"expected": sum(expected.values()), "saved": sum(actual.values()),
+            "missing": missing, "complete": not missing}
 
 
 def main():
@@ -192,12 +197,12 @@ def main():
             status["stage"] = "motion_test_complete"
             print("Motion-only run complete; no calibration was fitted.", flush=True)
             return 0
-        verify_captures(session, waypoints)
         stop_process(camera, "Camera recorder")
         stop_process(bridge, "Robot state bridge")
+        status["capture_summary"] = verify_captures(session, waypoints)
         status["stage"] = "solving_and_validating"
         atomic_json(session / "pipeline_status.json", status)
-        print("Captures complete. Fitting calibration and evaluating held-out poses…", flush=True)
+        print("Capture sequence finished. Fitting saved observations and evaluating held-out poses…", flush=True)
         code = subprocess.run(camera_command(camera_python, ROOT / "solve_scene.py",
                                               "--session", session, "--output", output)).returncode
         status["solver_exit_code"] = code

@@ -67,15 +67,17 @@ Failed capture acknowledgements trigger three retries after the initial attempt
 (four attempts total). Set `--retake-pause 2` for the delay between attempts,
 independently of the post-movement `--wait-seconds` pause. Optionally override
 the retry count with `--capture-retries`. The robot stays at the same waypoint
-and the sequence advances only after successful saving. Exhausted retries stop
-replay and preserve partial data. An acknowledgement timeout reuses the pending
+and advances after successful saving or exhausted retries. Exhausted retries
+skip that capture with a warning and continue replay. Missing captures are listed
+in pipeline_status.json under capture_summary and do not block the solver.
+Duplicate, unknown, or incorrectly labelled captures are still rejected. An acknowledgement timeout reuses the pending
 request ID to avoid duplicate captures if a success arrives late. Robot errors,
 stale state, a stopped/restarted recorder, and unexpected robot motion still
 stop immediately rather than being treated as a rejected camera observation.
 
 Each run stores `pipeline_config.json`, `trajectory.json`, and
 `pipeline_status.json` alongside images, robot states, and motion feedback.
-After every requested capture has been acknowledged, cameras/bridge stop and
+After replay finishes, cameras/bridge stop and
 `solve_scene.py` prints fitting and held-out evaluation results. A computed
 calibration always exports `scene.json`, `panda.urdf`, `calibration_report.json`,
 and `calibration_summary.txt`, even if error limits are exceeded. Failed
@@ -85,8 +87,9 @@ warnings in the scene file. The pipeline records
 Export completion returns exit code zero; inspect the validation flag to decide
 whether the estimate meets your accuracy requirements. Missing or unusable
 input still prevents solving and no transforms are invented.
-Failed motion/capture preserves partial data and
-does not run the solver. Ctrl+C requests runner cancellation before stopping
+Failed motion or a recorder/state failure preserves partial data and
+does not run the solver. Individual rejected captures do not prevent solving;
+the solver checks whether enough usable observations remain for each camera. Ctrl+C requests runner cancellation before stopping
 the bridge and cameras. The existing Panda launch remains running.
 
 To investigate or refit a saved dataset without moving the robot:

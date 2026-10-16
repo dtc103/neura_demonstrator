@@ -47,8 +47,9 @@ class TrajectoryTests(unittest.TestCase):
         self.assertEqual(runner.check_capture_state.call_count, 6)
         runner.plan["retake_pause"] = 0
         runner.capture_once = Mock(side_effect=run_trajectory.CaptureFailure("No board"))
-        with self.assertRaisesRegex(ValueError, "after 4 attempts"):
+        with patch('builtins.print') as output:
             runner.capture(waypoint)
+        self.assertIn("Skipping capture at one after 4 attempts", output.call_args.args[0])
         self.assertEqual(runner.capture_once.call_count, 4)
 
     def test_capture_timeout_reuses_request_and_robot_errors_do_not_retry(self):
@@ -401,7 +402,7 @@ class AutomaticCaptureTests(unittest.TestCase):
                  patch.object(capture_scene, "observe", side_effect=observe), \
                  patch.object(capture_scene, "read_robot", return_value={"bridge_id": "test", "samples": []}), \
                  patch.object(capture_scene, "stable_robot_sample", return_value=(samples[0]["robot"], np.eye(4))), \
-                 patch.object(cv2, "namedWindow"), patch.object(cv2, "imshow"), patch.object(cv2, "destroyAllWindows"), \
+                 patch.object(cv2, "namedWindow"), patch.object(cv2, "resizeWindow"), patch.object(cv2, "imshow"), patch.object(cv2, "destroyAllWindows"), \
                  patch.object(cv2, "waitKey", side_effect=[255, ord("q")]), patch.object(cv2, "getWindowProperty", return_value=1):
                 capture_scene.main()
             response = json.loads((root / "capture_response.json").read_text())

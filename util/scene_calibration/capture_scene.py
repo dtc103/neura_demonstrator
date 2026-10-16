@@ -198,6 +198,7 @@ def main():
         status = "Waiting for all three color streams and robot state bridge"
         window = "Scene calibration — SPACE=train, V=validation"
         cv2.namedWindow(window, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(window, 960, 840)
         preview_started = time.monotonic()
         while True:
             for role, camera in cameras.items():
@@ -206,7 +207,7 @@ def main():
                     image, stamp = frame
                     observation, display, message = observe(image, detector, board, camera.metadata["intrinsics"])
                     cached[role] = (image, stamp, observation, display, message)
-            tiles = []
+            tiles = {}
             now = time.monotonic_ns()
             if args.accept_requests and now - last_heartbeat > 250_000_000:
                 write_json(session / "capture_ready.json", {
@@ -215,22 +216,26 @@ def main():
                     "board_detected": {role: role in cached and cached[role][2] is not None for role in ROLES}})
                 last_heartbeat = now
             for role in ROLES:
+                tile_width, tile_height = (1280, 720) if role == "wrist" else (640, 360)
                 if role not in cached:
-                    tile = np.zeros((360, 640, 3), dtype=np.uint8)
+                    tile = np.zeros((tile_height, tile_width, 3), dtype=np.uint8)
                     message = "Waiting for frames"
                 else:
                     _, stamp, _, display, message = cached[role]
-                    tile = cv2.resize(display, (640, 360))
+                    tile = cv2.resize(display, (tile_width, tile_height))
                     if now - stamp["received_monotonic_ns"] > 200_000_000:
                         message = "STALE CAMERA FRAME"
-                cv2.rectangle(tile, (0, 0), (640, 45), (0, 0, 0), -1)
+                cv2.rectangle(tile, (0, 0), (tile_width, 45), (0, 0, 0), -1)
                 cv2.putText(tile, f"{role}: {config['cameras'][role]}", (8, 18), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
                 cv2.putText(tile, message, (8, 37), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0, 220, 255), 1)
                 counts = f"Saved: {coverage['train'][role]} fitting / {coverage['validation'][role]} validation"
                 cv2.putText(tile, counts, (8, 61), cv2.FONT_HERSHEY_SIMPLEX, 0.43, (0, 255, 0), 1)
-                tiles.append(tile)
-            grid = np.hstack(tiles)
-            cv2.putText(grid, status[:180], (10, 350), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
+                tiles[role] = tile
+            # Preserve the 16:9 views: the full-width wrist view is twice
+            # the height of either top tile, rather than stretched sideways.
+            footer = np.zeros((40, 1280, 3), dtype=np.uint8)
+            cv2.putText(footer, status[:180], (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 255, 0), 1)
+            grid = np.vstack((np.hstack((tiles["side"], tiles["opposite"])), tiles["wrist"], footer))
             cv2.imshow(window, grid)
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), 27):
