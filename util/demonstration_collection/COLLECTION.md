@@ -47,7 +47,22 @@ reset path from representative task-end configurations. Reset speed has its own
 --reset-speed parameter (default 0.25 rad/s); teleoperation speed overrides do
 not accelerate resets. Reset goals retain finite position and time tolerances.
 
+Add `--disable-reset-path-tolerance` (alias `--disable-path-tolerance`) to
+`run_collection.py` to disable the ROS trajectory action's path tolerances
+for reset movements. By default the reset position path tolerance is 0.15 rad.
+The option applies to both the initial reset and resets after episodes; it is
+saved in session settings. Final goal tolerance (0.03 rad), goal time allowance
+(5 seconds), reset timeout, robot fault checks, and teleoperation tracking checks
+remain active. It does not change force/collision thresholds or replay settings.
+
 ## Start a session
+
+The GUI's optional **Session name** field chooses the recording folder name
+under the output directory (also available as `--session-name NAME`). Names are
+independent of the task prompts; spaces and Unicode are supported, leading and
+trailing whitespace is trimmed, and path separators are rejected. Reusing a name
+creates `_002`, `_003`, etc., without overwriting recordings. Blank names retain
+the timestamp naming scheme. Replay discovers both named and timestamped sessions.
 
 Terminal 1, your normal driver (joint trajectory controller active):
 
@@ -78,6 +93,15 @@ The GUI automatically calls `setup_quest.sh` on startup with the selected `--por
 (default 8443). This sets up ADB USB forwarding and requests the Quest proximity
 override, so the headset behaves as worn. A disconnected or unauthorized headset
 produces a terminal warning without preventing the GUI from opening.
+
+At GUI startup, a background thread also hardware-resets the three cameras in
+`--camera-config`. Close other camera programs before launching collection.
+The Quest server and task fields remain usable during the reset. **Prepare
+session** becomes available after a ten-second reboot pause and reconnection
+of all configured serials (up to thirty additional seconds). A reset failure is
+shown in the GUI and terminal, with a **Retry camera reset** button. Streaming
+is still checked during session preparation. Cameras are reset once per program
+launch, not between sessions or episodes.
 
 After reconnecting the headset, retry manually (use your selected port):
 

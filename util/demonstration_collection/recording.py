@@ -19,19 +19,36 @@ def stamp():
     return datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%fZ')
 
 
+def session_name(value):
+    name = (value or '').strip()
+    if name and (name in ('.', '..') or name.startswith('.') or name.endswith('.')
+                 or any(c in '/\\<>:"|?*' or ord(c) < 32 or ord(c) == 127 for c in name)
+                 or len(name.encode('utf-8')) > 180):
+        raise ValueError('Session name must be a folder name (max 180 UTF-8 bytes), without path separators or special filename characters.')
+    return name
+
+
 class Recorder:
-    def __init__(self, root, metadata, capacity=256, image_format="npy"):
+    def __init__(self, root, metadata, capacity=256, image_format="npy", name=''):
         if image_format not in ('npy', 'png'):
             raise ValueError('Unknown lossless image format')
         self.image_format = image_format
-        self.root = Path(root) / ('session_' + stamp())
-        self.root.mkdir(parents=True, exist_ok=False)
+        name = session_name(name)
+        base = name or ('session_' + stamp())
+        suffix = 1
+        while True:
+            self.root = Path(root) / (base if suffix == 1 else f'{base}_{suffix:03d}')
+            try:
+                self.root.mkdir(parents=True, exist_ok=False)
+                break
+            except FileExistsError:
+                suffix += 1
         atomic_json(self.root / 'session.json', {
             'schema_version': 1, 'created_utc': stamp(),
             'clock': 'host monotonic_ns; original clocks retained separately',
             'image_encoding': image_format, 'color_order_on_disk': 'BGR uint8',
             'depth_encoding': 'native unaligned uint16; multiply by depth_scale_m',
-            **metadata})
+            **metadata, 'session_name': name, 'session_directory': self.root.name})
         self.queue = queue.Queue(capacity)
         self.lock = threading.Lock()
         self.active = None

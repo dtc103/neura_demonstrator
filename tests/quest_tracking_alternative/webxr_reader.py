@@ -30,6 +30,20 @@ def validate_frame(data, allowed_spaces=("local-floor",)):
         raise ValueError("Expected left and right controller entries")
     result = {"source": source, "sequence": data["sequence"], "epoch": data["epoch"],
               "reference_space": data["reference_space"], "controllers": {}}
+    if "controller_buttons" in data:
+        entries = data["controller_buttons"]
+        if not isinstance(entries, dict) or set(entries) != {"left", "right"}:
+            raise ValueError("Expected left and right button entries")
+        result["controller_buttons"] = {}
+        for hand, buttons in entries.items():
+            if buttons is None:
+                result["controller_buttons"][hand] = None
+                continue
+            if (not isinstance(buttons, dict) or buttons.get("input_type") != "controller"
+                    or any(type(buttons.get(key)) is not bool for key in ("select", "secondary"))):
+                raise ValueError("Invalid physical controller buttons")
+            result["controller_buttons"][hand] = {
+                key: buttons[key] for key in ("input_type", "select", "secondary")}
     if "timing" in data:
         timing = data["timing"]
         if not isinstance(timing, dict):

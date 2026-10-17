@@ -24,11 +24,18 @@ syncClock();
 
 function payload(frame, frameTime) {
   const controllers = {left:null, right:null};
+  const controller_buttons = {left:null, right:null};
   if (session.visibilityState === 'visible') {
     for (const input of session.inputSources) {
       // Do not let a hand-tracking source replace a physical controller.
       if (input.hand || !input.gamepad || !input.gripSpace ||
           input.gamepad.mapping !== 'xr-standard' || !(input.handedness in controllers)) continue;
+      // Buttons remain usable when the physical controller has no tracked pose.
+      controller_buttons[input.handedness] = {
+        input_type:'controller',
+        select:input.gamepad.buttons[4]?.pressed ?? false,
+        secondary:input.gamepad.buttons[5]?.pressed ?? false
+      };
       const pose = frame.getPose(input.gripSpace, space);
       if (!pose || pose.emulatedPosition) continue;
       const p = pose.transform.position, q = pose.transform.orientation;
@@ -45,7 +52,7 @@ function payload(frame, frameTime) {
       };
     }
   }
-  return {reference_space:'local-floor', source, epoch, sequence:sequence++, controllers,
+  return {reference_space:'local-floor', source, epoch, sequence:sequence++, controllers, controller_buttons,
     timing:{frame_time_ms:frameTime, sample_time_ms:performance.now(), time_origin_ms:performance.timeOrigin,
       host_offset_ns:clockSync?.host_offset_ns ?? null,
       round_trip_ms:clockSync?.round_trip_ms ?? null,

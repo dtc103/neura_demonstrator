@@ -3,7 +3,7 @@ import copy
 import threading
 import time
 import numpy as np
-from joint_teleop import JOINTS, Kinematics
+from panda_controller import JOINTS, Kinematics
 from replay_data import ReplayPlan
 from collection_control import Reset
 

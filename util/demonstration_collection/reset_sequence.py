@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 import numpy as np
-from joint_teleop import JOINTS, Segment
+from panda_controller import JOINTS, Segment
 
 
 def load_sequence(path):

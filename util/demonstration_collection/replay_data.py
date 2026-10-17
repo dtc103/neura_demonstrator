@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import numpy as np
 from scipy.interpolate import make_interp_spline, PPoly
-from joint_teleop import JOINTS
+from panda_controller import JOINTS
 
 
 def rows(path):
@@ -18,7 +18,9 @@ def rows(path):
 
 def list_episodes(root):
     result = []
-    for path in sorted(Path(root).expanduser().glob('session_*/episode_*/episode.json')):
+    for path in sorted(Path(root).expanduser().glob('*/episode_*/episode.json')):
+        if not (path.parent.parent / 'session.json').is_file():
+            continue
         try:
             metadata = json.loads(path.read_text())
             result.append((path.parent, metadata))

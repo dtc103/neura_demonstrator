@@ -5,10 +5,12 @@ import os
 import signal
 import subprocess
 import threading
+import queue
 import traceback
 from pathlib import Path
 from teleoperate import arguments, run, WebXRReader
 from collection_control import Collection
+from camera_reset import reset_cameras
 
 
 def setup_quest(port):
@@ -84,6 +86,9 @@ def main():
             self.collection = None
             self.worker = None
             self.replay_dialog = None
+            self.reset_events = queue.SimpleQueue()
+            self.reset_cancel = threading.Event()
+            self.reset_phase = 'resetting'
             self.setWindowTitle('Panda demonstration collection')
             self.resize(1240, 900)
             self.setMinimumSize(960, 850)
@@ -145,6 +150,11 @@ def main():
             label = QtWidgets.QLabel('01  Set up your task')
             label.setObjectName('section')
             box.addWidget(label)
+            self.session_name = QtWidgets.QLineEdit(args.session_name)
+            self.session_name.setAccessibleName('Session name')
+            self.session_name.setPlaceholderText('Session name (optional), e.g. pbluegyellow')
+            self.session_name.setToolTip('Used as the session folder name. Repeated names get _002, _003, etc. Leave blank for a timestamp.')
+            box.addWidget(self.session_name)
             self.prompt = QtWidgets.QLineEdit()
             self.prompt.setAccessibleName('Task prompt')
             self.prompt.setPlaceholderText('Task descriptions separated by ;  e.g. Place the gear on the plate; Move the gear onto the plate')
@@ -173,6 +183,7 @@ def main():
             self.prepare = QtWidgets.QPushButton('Prepare session  →')
             self.prepare.setObjectName('primary')
             self.prepare.clicked.connect(self.start)
+            self.prepare.setEnabled(False)
             footer.addWidget(self.prepare)
             box.addLayout(footer)
             layout.addWidget(setup)
@@ -249,6 +260,18 @@ def main():
             self.timer.timeout.connect(self.refresh)
             self.timer.start(150)
 
+        def start_camera_reset(self):
+            self.reset_phase = 'resetting'
+            self.prepare.setEnabled(False)
+            self.prepare.setText('Restarting cameras…')
+            self.status.setText('Restarting cameras in the background. You can prepare the Quest and task fields.')
+            def report(phase, message):
+                print(message, flush=True)
+                self.reset_events.put((phase, message))
+            threading.Thread(target=reset_cameras,
+                             args=(args.camera_config, self.reset_cancel, report),
+                             name='camera-startup-reset', daemon=True).start()
+
         def open_replay(self):
             if self.worker and self.worker.is_alive():
                 QtWidgets.QMessageBox.information(self, 'Close collection first',
@@ -277,16 +300,22 @@ def main():
                 self.collection.commands.put(value)
 
         def start(self):
+            if self.reset_phase == 'failed':
+                self.start_camera_reset()
+                return
+            if self.reset_phase != 'ready':
+                return
             if self.worker and self.worker.is_alive():
                 return
             args.output = Path(self.output.text()).expanduser()
+            args.session_name = self.session_name.text()
             try:
                 self.collection = Collection(args, self.prompt.text(), Path(self.sequence.text()).expanduser())
             except Exception as error:
                 self.status.setText(str(error))
                 return
             self.prepare.setEnabled(False)
-            for widget in (self.prompt, self.sequence, self.output, *self.browse_buttons):
+            for widget in (self.session_name, self.prompt, self.sequence, self.output, *self.browse_buttons):
                 widget.setEnabled(False)
             def work():
                 try:
@@ -299,6 +328,14 @@ def main():
             self.worker.start()
 
         def refresh(self):
+            while not self.reset_events.empty():
+                self.reset_phase, message = self.reset_events.get()
+                self.status.setText(message)
+                self.phase_badge.setText({'resetting': 'CAMERAS RESTARTING',
+                                         'ready': 'NOT STARTED', 'failed': 'CAMERA RESET FAILED'}[self.reset_phase])
+                self.prepare.setText({'resetting': 'Restarting cameras…',
+                                      'ready': 'Prepare session  →', 'failed': 'Retry camera reset'}[self.reset_phase])
+                self.prepare.setEnabled(self.reset_phase != 'resetting')
             c = self.collection
             if c is None:
                 return
@@ -327,7 +364,7 @@ def main():
                 label.setText('Waiting' if age is None else f'{age:.1f}s old' if age > 1.5 else '● Live')
             if self.worker and not self.worker.is_alive():
                 self.prepare.setEnabled(True)
-                for widget in (self.prompt, self.sequence, self.output, *self.browse_buttons):
+                for widget in (self.session_name, self.prompt, self.sequence, self.output, *self.browse_buttons):
                     widget.setEnabled(True)
             if c.cameras:
                 for role, bgr in list(c.cameras.latest.items()):
@@ -346,16 +383,20 @@ def main():
                 self.status.setText('Stopping control and flushing recordings. Close again once finished.')
                 event.ignore()
             else:
+                self.reset_cancel.set()
                 event.accept()
 
     try:
         window = Window()
         window.show()
+        window.start_camera_reset()
         threading.Thread(target=setup_quest, args=(args.port,), daemon=True).start()
         signal.signal(signal.SIGINT, lambda *_: window.close())
         signal.signal(signal.SIGTERM, lambda *_: window.close())
         return app.exec()
     finally:
+        if 'window' in locals():
+            window.reset_cancel.set()
         reader.stop()
 
 

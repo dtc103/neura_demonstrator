@@ -5,7 +5,7 @@ import json
 import time
 from pathlib import Path
 import numpy as np
-from joint_teleop import JOINTS
+from panda_controller import JOINTS
 from recording import atomic_json
 
 

@@ -8,9 +8,9 @@ import time
 from pathlib import Path
 import numpy as np
 from collection_cameras import Cameras
-from recording import Recorder
+from recording import Recorder, session_name
 from reset_sequence import load_sequence, reset_segment
-from joint_teleop import JOINTS
+from panda_controller import JOINTS
 
 
 class Edges:
@@ -29,7 +29,8 @@ class Edges:
             self.identity = identity
         pressed = set()
         for key, hand, field in [('A', 'right', 'select'), ('X', 'left', 'select'), ('Y', 'left', 'secondary')]:
-            pose = frame['controllers'][hand]
+            # Pose loss must not hide episode buttons. Older clients use poses.
+            pose = frame.get('controller_buttons', frame['controllers'])[hand]
             if pose is None:
                 self.previous.pop(key, None)
                 continue
@@ -41,13 +42,14 @@ class Edges:
 
 
 class Reset:
-    def __init__(self, node, model, sequence, speed):
+    def __init__(self, node, model, sequence, speed, disable_path_tolerance=False):
         from rclpy.action import ActionClient
         from control_msgs.action import FollowJointTrajectory
         from franka_msgs.action import Move
         self.client = ActionClient(node, FollowJointTrajectory, '/joint_trajectory_controller/follow_joint_trajectory')
         self.gripper = ActionClient(node, Move, '/panda_gripper/move')
         self.model, self.sequence, self.speed = model, sequence, speed
+        self.disable_path_tolerance = disable_path_tolerance
         self.pending = self.handle = self.result = None
         self.index = -1
         self.deadline = 0
@@ -112,13 +114,20 @@ class Reset:
             point.time_from_start = Duration(seconds=float(seconds)).to_msg()
             goal.trajectory.points.append(point)
         goal.goal_tolerance = [JointTolerance(name=name, position=.03) for name in JOINTS]
-        goal.path_tolerance = [JointTolerance(name=name, position=.15) for name in JOINTS]
+        goal.path_tolerance = self.path_tolerances(JointTolerance)
         goal.goal_time_tolerance = Duration(seconds=5.).to_msg()
         self.on_command('trajectory', goal)
         self.pending = self.client.send_goal_async(goal)
         self.pending.add_done_callback(self._accepted)
         self.deadline = now+segment.duration+10
         return False
+
+    def path_tolerances(self, tolerance_type):
+        if self.disable_path_tolerance:
+            # -1 erases a tolerance; 0 would inherit the controller default.
+            return [tolerance_type(name=name, position=-1., velocity=-1., acceleration=-1.)
+                    for name in JOINTS]
+        return [tolerance_type(name=name, position=.15) for name in JOINTS]
 
     def cancel(self):
         self.closed = True
@@ -129,6 +138,7 @@ class Reset:
 class Collection:
     def __init__(self, args, prompt, sequence_path):
         self.args = args
+        self.session_name = session_name(getattr(args, 'session_name', ''))
         self.prompts = [part.strip() for part in prompt.split(';') if part.strip()]
         if not self.prompts:
             raise ValueError('Enter at least one nonempty task description')
@@ -163,10 +173,14 @@ class Collection:
             'camera_serials': serials, 'preview': not self.args.execute}
         if self.args.scene:
             metadata['scene_calibration'] = json.loads(Path(self.args.scene).read_text())
-        self.recorder = Recorder(self.args.output, metadata, image_format=self.args.image_format)
+        self.recorder = Recorder(self.args.output, metadata, image_format=self.args.image_format,
+                                 name=self.session_name)
         (self.recorder.root / 'robot.urdf').write_text(xml)
         self.cameras = Cameras(serials, self.recorder, self.args.camera_width, self.args.camera_height, self.args.camera_fps)
-        self.reset = Reset(node, model, self.sequence, self.args.reset_speed)
+        self.reset = Reset(node, model, self.sequence, self.args.reset_speed,
+                           disable_path_tolerance=self.args.disable_reset_path_tolerance)
+        print('Reset path tolerance: ' + ('disabled' if self.args.disable_reset_path_tolerance else '0.15 rad')
+              + '; final goal tolerance: 0.03 rad; goal time allowance: 5s.', flush=True)
         from rosidl_runtime_py.convert import message_to_ordereddict
         self.reset.on_command = lambda kind, msg: self.recorder.record_session(
             'reset_' + kind, message_to_ordereddict(msg))
@@ -199,8 +213,7 @@ class Collection:
             edges.add(command)
         if self.phase == 'resetting':
             if not self.args.execute or self.reset.tick(q, dq, now):
-                planner.segment = None
-                planner.moving = False
+                planner.reset()
                 mapper.suspend(measured)
                 mapper.target = measured.copy()
                 mapper.ready = False
